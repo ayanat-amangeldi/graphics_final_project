@@ -1,0 +1,40 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Concert: configure",
+      "type": "process",
+      "command": "cmake",
+      "args": ["-S", ".", "-B", "build/cmake", "-DCMAKE_BUILD_TYPE=Release"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Concert: build",
+      "type": "process",
+      "command": "cmake",
+      "args": ["--build", "build/cmake", "--config", "Release", "--parallel"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "dependsOn": "Concert: configure",
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": ["$gcc", "$msCompile"]
+    },
+    {
+      "label": "Concert: test maths",
+      "type": "process",
+      "command": "ctest",
+      "args": ["--test-dir", "build/cmake", "-C", "Release", "--output-on-failure"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "dependsOn": "Concert: build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Concert: make on macOS",
+      "type": "process",
+      "command": "make",
+      "args": ["run"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": ["$gcc"]
+    }
+  ]
+}
