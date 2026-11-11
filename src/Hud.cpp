@@ -58,16 +58,25 @@ void quad(std::vector<Vertex>& v,std::vector<unsigned int>& i,float x,float y,fl
 }
 }
 void Hud::draw(int width,int height,float fps,const SceneState& state) {
+    
     std::ostringstream out;
-    out<<"CONCERT STAGE - SCAFFOLD\nFPS: "<<static_cast<int>(fps)
-       <<"  PRESET: "<<state.preset<<"  "<<(state.paused?"PAUSED":"RUNNING");
-    if(state.showHelp) {
-        out<<"\nWASD MOVE  Q/E DOWN/UP  SHIFT FAST\nTAB MOUSE CAPTURE  R RESET CAMERA"
-           <<"\n1/2/3 PRESET STATE AND MARKER COLOUR\nSPACE FOCUS REQUEST: "<<(state.focusSinger?"ON":"OFF")
-           <<" [STUB]\nC CONFETTI REQUEST [STUB]\nL LED ANIMATION STATE: "<<(state.ledAnimated?"ON":"OFF")
-           <<" [STUB]\nP PAUSE  H HELP  ESC QUIT\nYELLOW BLOCK: SINGER POSITION"
-           <<"\nMARKERS ARE NOT FINISHED FEATURES";
-    }
+
+    out << "CONCERT STAGE"
+        << "\nFPS: " << static_cast<int>(fps)
+        << "  PRESET: " << state.preset
+        << "  " << (state.paused ? "PAUSED" : "RUNNING");
+
+    if (state.showHelp) {
+        out << "\nWASD MOVE  MOUSE LOOK  Q/E UP-DOWN"
+            << "\nSHIFT FAST  TAB CURSOR  R RESET"
+            << "\n1/2/3 PRESETS"
+            << "\nL LED: "
+            << (state.ledAnimated ? "ANIMATING" : "FROZEN")
+            << "\nP PAUSE  H HELP  ESC EXIT"
+            << "\nSPACE FOCUS REQUEST"
+            << "\nC CONFETTI REQUEST";
+}
+
     std::string text=out.str();
     if(text!=lastText_ || width!=lastWidth_ || height!=lastHeight_) {
         lastText_=text;lastWidth_=width;lastHeight_=height;

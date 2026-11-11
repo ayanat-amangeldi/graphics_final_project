@@ -1,9 +1,21 @@
 #include "concert/Scene.hpp"
 
 namespace concert {
-void LedScreen::draw(Renderer& r,const SceneState&) const {
-    // TODO teammate 4: add led.vert/led.frag, animated patterns, own shader clock.
-    // Static screen marks dimensions; L currently changes only the shared state.
-    r.box(config::ledCenter,config::ledSize,{0.075f,0.12f,0.2f},false,0.5f);
+
+void LedScreen::update(const SceneState& state, float dt) {
+    if (state.ledAnimated) {
+        elapsed_ += dt;
+    }
 }
+
+void LedScreen::draw(Renderer& r, const SceneState& state) const {
+    r.drawLed(
+        config::ledCenter,
+        config::ledSize,
+        elapsed_,
+        state.preset
+    );
 }
+
+}
+    
