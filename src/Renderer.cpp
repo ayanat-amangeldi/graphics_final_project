@@ -4,7 +4,8 @@
 
 namespace concert {
 Renderer::Renderer(const std::filesystem::path& path)
-    :shader_(path/"scene.vert",path/"scene.frag"),cube_(Mesh::cube()),
+    :shader_(path/"scene.vert",path/"scene.frag"),
+     ledShader_(path/"led.vert",path/"led.frag"),cube_(Mesh::cube()),
      crowdShader_(path/"crowd.vert",path/"crowd.frag"),
      confettiShader_(path/"confetti.vert",path/"confetti.frag") {
     // One combined low-poly spectator mesh: head, torso, arms and legs are
@@ -122,6 +123,10 @@ void Renderer::begin(const Camera& camera,int width,int height) {
     shader_.set("uProjection",projection_);
     shader_.set("uCamera",camera.position());
     // Neutral work lights for the scaffold; LightShow owner replaces these with spotlights.
+    ledShader_.use();
+    ledShader_.set("uView", view_);
+    ledShader_.set("uProjection", projection_);
+    shader_.use();
     shader_.set("uLightPosition0",Vec3{-6,9,7});
     shader_.set("uLightPosition1",Vec3{6,7,-2});
     shader_.set("uLightColor0",Vec3{1.0f,0.91f,0.8f});
@@ -168,4 +173,18 @@ void Renderer::drawConfetti(const std::vector<ConfettiInstance>& instances) {
     gl::BindVertexArray(0);
     gl::Enable(gl::CULL_FACE);
 }
+
+void Renderer::drawLed(Vec3 center, Vec3 size,
+                       float time, int preset) {
+    ledShader_.use();
+
+    Mat4 model = translation(center) * scaling(size);
+
+    ledShader_.set("uModel", model);
+    ledShader_.set("uTime", time);
+    ledShader_.set("uPreset", preset);
+
+    cube_.draw();
+}
+
 }

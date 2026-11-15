@@ -22,8 +22,10 @@ public:
     void box(const Mat4& model,Vec3 color,bool grid=false,float emission=0);
     void drawCrowd(const std::vector<CrowdInstance>& instances,float animationTime);
     void drawConfetti(const std::vector<ConfettiInstance>& instances);
+    void drawLed(Vec3 center, Vec3 size, float time, int preset);
 private:
     Shader shader_;
+    Shader ledShader_;
     Mesh cube_;
     Shader crowdShader_;
     Shader confettiShader_;

@@ -31,14 +31,23 @@ private:
     std::vector<Particle> particles_;
     mutable std::vector<ConfettiInstance> renderParticles_;
 };
+
 class LedScreen {
-public: void draw(Renderer& renderer,const SceneState& state) const;
+public:
+    void update(const SceneState& state, float dt);
+    void draw(Renderer& renderer, const SceneState& state) const;
+
+private:
+    float elapsed_ = 0.0f;
 };
+
 class Scene {
 public:
     void update(const SceneState& state,float dt) {
-        lights_.update(state,dt);crowd_.update(state,dt);
-    }
+    lights_.update(state,dt);
+    crowd_.update(state,dt);
+    led_.update(state,dt);
+  }
     void draw(Renderer& renderer,const SceneState& state) const {
         lights_.configure(renderer,state);
         stage_.draw(renderer,state);lights_.draw(renderer,state);
