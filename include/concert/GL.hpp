@@ -12,7 +12,7 @@ namespace concert::gl {
 using Enum=unsigned int;using UInt=unsigned int;using Int=int;using Size=int;
 using Bool=unsigned char;using Bits=unsigned int;using Float=float;
 using SizePtr=std::ptrdiff_t;using Char=char;
-constexpr Enum ARRAY_BUFFER=0x8892,ELEMENT_ARRAY_BUFFER=0x8893,STATIC_DRAW=0x88E4;
+constexpr Enum ARRAY_BUFFER=0x8892,ELEMENT_ARRAY_BUFFER=0x8893,STATIC_DRAW=0x88E4,DYNAMIC_DRAW=0x88E8;
 constexpr Enum FLOAT=0x1406,UNSIGNED_INT=0x1405,UNSIGNED_BYTE=0x1401;
 constexpr Enum TRIANGLES=0x0004,VERTEX_SHADER=0x8B31,FRAGMENT_SHADER=0x8B30;
 constexpr Enum COMPILE_STATUS=0x8B81,LINK_STATUS=0x8B82,INFO_LOG_LENGTH=0x8B84;
@@ -39,6 +39,7 @@ constexpr Bool FALSE_VALUE=0;
  X(void,BufferData,(Enum,SizePtr,const void*,Enum)) \
  X(void,EnableVertexAttribArray,(UInt)) \
  X(void,VertexAttribPointer,(UInt,Int,Enum,Bool,Size,const void*)) \
+ X(void,VertexAttribDivisor,(UInt,UInt)) \
  X(UInt,CreateShader,(Enum)) \
  X(void,ShaderSource,(UInt,Size,const Char* const*,const Int*)) \
  X(void,CompileShader,(UInt)) \
@@ -58,6 +59,7 @@ constexpr Bool FALSE_VALUE=0;
  X(void,Uniform1f,(Int,Float)) \
  X(void,Uniform1i,(Int,Int)) \
  X(void,DrawElements,(Enum,Size,Enum,const void*)) \
+ X(void,DrawElementsInstanced,(Enum,Size,Enum,const void*,Size)) \
  X(void,ReadPixels,(Int,Int,Size,Size,Enum,Enum,void*)) \
  X(void,ReadBuffer,(Enum)) \
  X(void,PixelStorei,(Enum,Int))

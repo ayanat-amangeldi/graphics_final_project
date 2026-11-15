@@ -1,6 +1,7 @@
 #pragma once
 #include "Renderer.hpp"
 #include "State.hpp"
+#include <vector>
 
 namespace concert {
 // Each teammate owns one module and its source file. No GLFW calls in modules.
@@ -15,9 +16,20 @@ public:
 };
 class Crowd {
 public:
+    Crowd();
     void update(const SceneState& state,float dt);
     void draw(Renderer& renderer,const SceneState& state) const;
-private: std::uint64_t lastConfettiRequest_=0;
+private:
+    struct Particle {
+        Vec3 position,velocity,color;
+        float sizeX=0,sizeY=0,rotation=0,rotationSpeed=0,age=0,wobblePhase=0;
+    };
+    void spawnConfetti();
+    std::uint64_t lastConfettiRequest_=0;
+    float animationTime_=0;
+    std::uint32_t randomState_=0x6D2B79F5u;
+    std::vector<Particle> particles_;
+    mutable std::vector<ConfettiInstance> renderParticles_;
 };
 class LedScreen {
 public: void draw(Renderer& renderer,const SceneState& state) const;
