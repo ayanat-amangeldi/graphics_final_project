@@ -21,12 +21,12 @@ float randomRange(std::uint32_t& state,float low,float high) {
 const std::vector<CrowdInstance>& audienceInstances() {
     static const std::vector<CrowdInstance> instances=[] {
         static const Vec3 palette[]={
-            {0.16f,0.38f,0.78f}, // blue
-            {0.78f,0.20f,0.24f}, // red
-            {0.86f,0.65f,0.16f}, // yellow
-            {0.18f,0.55f,0.34f}, // green
-            {0.48f,0.27f,0.68f}, // purple
-            {0.88f,0.40f,0.16f}  // orange
+            {0.22f,0.31f,0.52f},
+            {0.50f,0.26f,0.37f},
+            {0.48f,0.39f,0.34f},
+            {0.23f,0.40f,0.44f},
+            {0.40f,0.29f,0.57f},
+            {0.36f,0.39f,0.48f}
         };
         std::vector<CrowdInstance> result;
         result.reserve(static_cast<std::size_t>(config::crowdColumns*config::crowdRows));
@@ -34,7 +34,7 @@ const std::vector<CrowdInstance>& audienceInstances() {
         const float zStep=(config::crowdMaxZ-config::crowdMinZ)/(config::crowdRows-1);
         for(int row=0;row<config::crowdRows;++row) {
             for(int column=0;column<config::crowdColumns;++column) {
-                float x=config::crowdMinX+column*xStep;
+                float x=config::crowdMinX+column*xStep + (row%2==0 ? -0.21f : 0.21f);
                 float z=config::crowdMinZ+row*zStep;
                 const int index=row*config::crowdColumns+column;
                 Vec3 color=palette[(row*7+column*5)%6];
@@ -100,8 +100,8 @@ void Crowd::update(const SceneState& state,float dt) {
         return p.position.y < -0.5f || p.age > 12.0f;
     }),particles_.end());
 }
-void Crowd::draw(Renderer& renderer,const SceneState&) const {
-    renderer.drawCrowd(audienceInstances(),animationTime_);
+void Crowd::draw(Renderer& renderer,const SceneState& state) const {
+    renderer.drawCrowd(audienceInstances(),animationTime_,state.beatPulse);
     renderParticles_.clear();
     for(const Particle& particle:particles_)
         renderParticles_.push_back({particle.position,particle.color,particle.sizeX,

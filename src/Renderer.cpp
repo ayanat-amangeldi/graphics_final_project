@@ -199,7 +199,7 @@ void Renderer::box(const Mat4& model,Vec3 color,bool grid,float emission) {
     shader_.use();shader_.set("uModel",model);shader_.set("uColor",color);
     shader_.set("uGrid",grid?1:0);shader_.set("uEmission",emission);cube_.draw();
 }
-void Renderer::drawCrowd(const std::vector<CrowdInstance>& instances,float animationTime) {
+void Renderer::drawCrowd(const std::vector<CrowdInstance>& instances,float animationTime,float beatPulse) {
     if(instances.empty()) return;
     if(crowdInstanceCount_!=static_cast<gl::Size>(instances.size())) {
         gl::BindBuffer(gl::ARRAY_BUFFER,crowdInstanceBuffer_);
@@ -212,6 +212,7 @@ void Renderer::drawCrowd(const std::vector<CrowdInstance>& instances,float anima
     crowdShader_.set("uView",view_);
     crowdShader_.set("uProjection",projection_);
     crowdShader_.set("uAnimationTime",animationTime);
+    crowdShader_.set("uBeatPulse",beatPulse);
     gl::BindVertexArray(crowdVao_);
     gl::DrawElementsInstanced(gl::TRIANGLES,crowdIndexCount_,gl::UNSIGNED_INT,nullptr,
                               static_cast<gl::Size>(instances.size()));

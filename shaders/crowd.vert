@@ -10,15 +10,18 @@ layout(location=6) in vec4 aInstanceModel3;
 uniform mat4 uView;
 uniform mat4 uProjection;
 uniform float uAnimationTime;
+uniform float uBeatPulse;
 layout(location=7) in vec4 aInstanceStyle;
 
 flat out vec3 vClothingColor;
 flat out int vPart;
+out vec3 vNormal;
 
 void main() {
     mat4 model = mat4(aInstanceModel0, aInstanceModel1,
                       aInstanceModel2, aInstanceModel3);
     vec3 position = aPosition;
+    vec3 normal = aNormal;
     vPart = int(aUV.x + 0.5);
     float phase = aInstanceStyle.w;
     float idle = sin(uAnimationTime * 1.15 + phase);
@@ -33,14 +36,23 @@ void main() {
         float angle = (vPart == 1 ? -1.0 : 1.0) * (wave + 0.025 * idle);
         vec2 pivot = vec2(vPart == 1 ? -0.22 : 0.22, 1.15);
         vec2 arm = position.xy - pivot;
-        position.xy = pivot + mat2(cos(angle), sin(angle), -sin(angle), cos(angle)) * arm;
+        mat2 armRotation = mat2(cos(angle), sin(angle), -sin(angle), cos(angle));
+        position.xy = pivot + armRotation * arm;
+        normal.xy = armRotation * normal.xy;
     }
 
     // A small per-person lean creates a gentle side-to-side sway.
     float sway = 0.035 * idle;
     vec2 body = position.xy - vec2(0.0, 0.75);
-    position.xy = vec2(0.0, 0.75) + mat2(cos(sway), sin(sway), -sin(sway), cos(sway)) * body;
+    mat2 swayRotation = mat2(cos(sway), sin(sway), -sin(sway), cos(sway));
+    position.xy = vec2(0.0, 0.75) + swayRotation * body;
+    normal.xy = swayRotation * normal.xy;
+    vNormal = normalize(mat3(model) * normal);
 
+    // Legs stay planted while the upper body bounces on the shared beat.
+    const float variation = 0.06;
+    float bounce = (0.10 + variation * (0.5 + 0.5 * sin(phase))) * uBeatPulse;
+    position.y += bounce * smoothstep(0.0, 1.15, aPosition.y);
     vClothingColor = aInstanceStyle.rgb;
     gl_Position = uProjection * uView * model * vec4(position, 1.0);
 }

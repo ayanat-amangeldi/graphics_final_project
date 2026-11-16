@@ -50,6 +50,12 @@ inline Mat4 rotationX(float a) {
     Mat4 r=Mat4::identity();float c=std::cos(a),s=std::sin(a);
     r.m[5]=c;r.m[9]=-s;r.m[6]=s;r.m[10]=c;return r;
 }
+inline Mat4 rotationZ(float angle) {
+    Mat4 r=Mat4::identity();
+    const float c=std::cos(angle), s=std::sin(angle);
+    r.m[0]=c; r.m[1]=s; r.m[4]=-s; r.m[5]=c;
+    return r;
+}
 inline Mat4 lookAt(Vec3 eye, Vec3 target, Vec3 up={0,1,0}) {
     Vec3 f=normalize(target-eye),s=normalize(cross(f,up)),u=cross(s,f);
     Mat4 r=Mat4::identity();

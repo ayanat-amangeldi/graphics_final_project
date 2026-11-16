@@ -26,7 +26,7 @@ public:
     void begin(const Camera& camera,int width,int height);
     void box(Vec3 center,Vec3 size,Vec3 color,bool grid=false,float emission=0);
     void box(const Mat4& model,Vec3 color,bool grid=false,float emission=0);
-    void drawCrowd(const std::vector<CrowdInstance>& instances,float animationTime);
+    void drawCrowd(const std::vector<CrowdInstance>& instances,float animationTime,float beatPulse);
     void drawConfetti(const std::vector<ConfettiInstance>& instances);
     void drawLed(Vec3 center, Vec3 size, float time, int preset);
     void setSpotlights(const Spotlights& lights);

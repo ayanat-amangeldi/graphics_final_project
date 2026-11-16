@@ -64,7 +64,8 @@ void Hud::draw(int width,int height,float fps,const SceneState& state) {
     out << "CONCERT STAGE"
         << "\nFPS: " << static_cast<int>(fps)
         << "  PRESET: " << state.preset
-        << "  " << (state.paused ? "PAUSED" : "RUNNING");
+        << "  " << (state.paused ? "PAUSED" : "RUNNING")
+        << (state.showHelp ? "" : "  H HELP");
 
     if (state.showHelp) {
         out << "\nWASD MOVE  MOUSE LOOK  Q/E UP-DOWN"
@@ -72,6 +73,8 @@ void Hud::draw(int width,int height,float fps,const SceneState& state) {
             << "\n1/2/3 PRESETS"
             << "\nL LED: "
             << (state.ledAnimated ? "ANIMATING" : "FROZEN")
+            << "\nM MUSIC: " << (!state.audioAvailable ? "UNAVAILABLE" : state.musicMuted ? "MUTED" : "ON")
+            << "  " << state.musicBpm << " BPM"
             << "\nP PAUSE  H HELP  ESC EXIT"
             << "\nHOLD SPACE: " << (state.focusSinger ? "SINGER FOCUS" : "FOCUS SINGER")
             << "\nC CONFETTI REQUEST";

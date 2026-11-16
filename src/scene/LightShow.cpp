@@ -1,4 +1,5 @@
 #include "concert/Scene.hpp"
+#include "concert/SingerPose.hpp"
 
 namespace concert {
 namespace {
@@ -31,11 +32,12 @@ void LightShow::update(const SceneState& state, float dt) {
     const Preset& preset = presets[state.preset - 1];
     phase_ = std::fmod(phase_ + dt * preset.speed, 2 * pi);
 
+    const Vec3 singerTarget = singerPose(state.animationTime).focusPoint();
     for (std::size_t i = 0; i < lights_.size(); ++i) {
         RigPose& pose = poses_[i];
         const Vec3 anchor = config::rigAnchors[i];
         const Vec3 pivot = anchor + Vec3{0, -0.42f, 0};
-        const Vec3 target = state.focusSinger ? config::singerTarget
+        const Vec3 target = state.focusSinger ? singerTarget
                                              : sweepTarget(state.preset, i, phase_);
         const Vec3 aim = normalize(target - pivot);
         const float yaw = std::atan2(-aim.x, -aim.z);
@@ -52,9 +54,12 @@ void LightShow::update(const SceneState& state, float dt) {
                                             : preset.colors[(i + i / 3) % 2];
         const float inner = state.focusSinger ? 4.0f : preset.innerAngle;
         const float outer = state.focusSinger ? 8.0f : preset.outerAngle;
+        // Keep the performer readable during focus, with a gentler pulse.
+        const float pulse = state.focusSinger ? 0.91f + 0.14f * state.beatPulse
+                                             : 0.63f + 0.46f * state.beatPulse;
         lights_[i] = {lens, direction, color, std::cos(radians(inner)),
-                      std::cos(radians(outer)), state.focusSinger ? 1.15f : preset.intensity,
-                      state.focusSinger ? 0.065f : 0.18f};
+                      std::cos(radians(outer)), (state.focusSinger ? 1.15f : preset.intensity) * pulse,
+                      (state.focusSinger ? 0.065f : 0.18f) * pulse};
     }
 }
 

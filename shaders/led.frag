@@ -42,7 +42,12 @@ void main()
     vec3 color = mix(colorA, colorB, pattern);
 
     float glow = 0.75 + 0.25 * sin(uTime * 1.5);
-    color *= glow;
+    vec2 cell = fract(uv * vec2(72.0, 28.0)) - 0.5;
+    float dotMask = 1.0 - smoothstep(0.32, 0.49, length(cell));
+    // Blend out the LED matrix when a cell spans less than two pixels.
+    vec2 cellAA = fwidth(uv * vec2(72.0, 28.0));
+    float visible = 1.0 - smoothstep(0.32, 0.65, max(cellAA.x, cellAA.y));
+    color *= (0.60 + 0.29 * glow) * mix(1.0, 0.76 + 0.24 * dotMask, visible);
 
     FragColor = vec4(color, 1.0);
 }
