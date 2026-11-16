@@ -5,6 +5,12 @@
 #include <vector>
 
 namespace concert {
+struct Spotlight {
+    Vec3 position, direction, color;
+    float innerCos = 0, outerCos = 0, intensity = 0, beamOpacity = 0;
+};
+using Spotlights = std::array<Spotlight, config::rigAnchors.size()>;
+
 struct CrowdInstance {
     Mat4 model;
     float color[4]{}; // RGB clothing color and stable animation phase.
@@ -23,7 +29,12 @@ public:
     void drawCrowd(const std::vector<CrowdInstance>& instances,float animationTime);
     void drawConfetti(const std::vector<ConfettiInstance>& instances);
     void drawLed(Vec3 center, Vec3 size, float time, int preset);
+    void setSpotlights(const Spotlights& lights);
+    void drawBeams(const Spotlights& lights);
 private:
+    Shader beamShader_;
+    Mesh beamCone_;
+    Vec3 cameraPosition_;
     Shader shader_;
     Shader ledShader_;
     Mesh cube_;

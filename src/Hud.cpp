@@ -73,7 +73,7 @@ void Hud::draw(int width,int height,float fps,const SceneState& state) {
             << "\nL LED: "
             << (state.ledAnimated ? "ANIMATING" : "FROZEN")
             << "\nP PAUSE  H HELP  ESC EXIT"
-            << "\nSPACE FOCUS REQUEST"
+            << "\nHOLD SPACE: " << (state.focusSinger ? "SINGER FOCUS" : "FOCUS SINGER")
             << "\nC CONFETTI REQUEST";
 }
 
