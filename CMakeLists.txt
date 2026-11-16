@@ -19,11 +19,16 @@ else()
 endif()
 
 add_executable(concert_stage
-    src/main.cpp src/GL.cpp src/Input.cpp src/Camera.cpp src/Shader.cpp
+    src/main.cpp src/Music.cpp src/GL.cpp src/Input.cpp src/Camera.cpp src/Shader.cpp
     src/Mesh.cpp src/Renderer.cpp src/Hud.cpp
     src/scene/Stage.cpp src/scene/LightShow.cpp src/scene/Crowd.cpp src/scene/LedScreen.cpp)
 target_include_directories(concert_stage PRIVATE include)
-target_link_libraries(concert_stage PRIVATE glfw)
+find_package(Threads REQUIRED)
+target_link_libraries(concert_stage PRIVATE glfw Threads::Threads ${CMAKE_DL_LIBS})
+if(APPLE)
+    target_link_libraries(concert_stage PRIVATE
+        "-framework CoreFoundation" "-framework CoreAudio" "-framework AudioToolbox")
+endif()
 target_compile_definitions(concert_stage PRIVATE CONCERT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 if(MSVC)
     target_compile_options(concert_stage PRIVATE /W4 /permissive- /utf-8)

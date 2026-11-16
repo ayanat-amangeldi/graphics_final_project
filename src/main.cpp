@@ -1,6 +1,7 @@
 #include "concert/Camera.hpp"
 #include "concert/GL.hpp"
 #include "concert/Hud.hpp"
+#include "concert/Music.hpp"
 #include "concert/Scene.hpp"
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
@@ -14,16 +15,43 @@
 
 namespace {
 using namespace concert;
-struct Options {bool smoke=false;std::filesystem::path shaderDir,screenshot;};
+struct Options {
+    bool smoke = false;
+    std::filesystem::path shaderDir, screenshot;
+    MusicTrack music;
+};
+
+double musicNumber(const std::string& value) {
+    std::size_t parsed = 0;
+    const double number = std::stod(value, &parsed);
+    if (parsed != value.size() || !std::isfinite(number))
+        throw std::runtime_error("Invalid music timing: " + value);
+    return number;
+}
 Options options(int argc,char** argv) {
     Options r;
     for(int i=1;i<argc;++i) {
         std::string a=argv[i];
         if(a=="--smoke-test") r.smoke=true;
+        else if(a=="--music" && i+1<argc) r.music.file=argv[++i];
+        else if((a=="--music-start" || a=="--music-bpm" || a=="--beat-offset") && i+1<argc) {
+            const double value=musicNumber(argv[++i]);
+            if (a=="--music-bpm") {
+                if (value<30 || value>300 || value!=std::floor(value))
+                    throw std::runtime_error("Music BPM must be an integer from 30 to 300.");
+                r.music.bpm=static_cast<int>(value);
+            } else if (a=="--music-start") r.music.startSeconds=value;
+            else r.music.firstBeatOffset=value;
+        }
         else if((a=="--shader-dir" || a=="--screenshot") && i+1<argc) {
             if(a=="--shader-dir") r.shaderDir=argv[++i];else r.screenshot=argv[++i];
-        } else throw std::runtime_error("Usage: concert_stage [--smoke-test] [--shader-dir PATH] [--screenshot FILE.ppm]");
+        } else throw std::runtime_error("Usage: concert_stage [--smoke-test] [--shader-dir PATH] [--screenshot FILE.ppm] [--music FILE --music-start SEC --music-bpm BPM --beat-offset SEC]");
     }
+    if (r.music.startSeconds<0 || r.music.firstBeatOffset<0 ||
+        r.music.firstBeatOffset>=60.0/r.music.bpm)
+        throw std::runtime_error("Music start cannot be negative and beat offset must be less than one beat.");
+    if (r.music.file.empty() && (r.music.startSeconds!=0 || r.music.firstBeatOffset!=0 || r.music.bpm!=120))
+        throw std::runtime_error("Music timing options require --music FILE.");
     if(!r.screenshot.empty() && !r.smoke)
         throw std::runtime_error("--screenshot requires --smoke-test");
     if(!r.shaderDir.empty()) return r;
@@ -59,6 +87,7 @@ void controls(Input& input,SceneState& state,Camera& camera,GLFWwindow* window) 
     for(int i=1;i<=3;++i) if(input.pressed(GLFW_KEY_1+i-1)) state.preset=i;
     if(input.pressed(GLFW_KEY_P)) state.paused=!state.paused;
     if(input.pressed(GLFW_KEY_H)) state.showHelp=!state.showHelp;
+    if(input.pressed(GLFW_KEY_M)) state.musicMuted=!state.musicMuted;
     if(input.pressed(GLFW_KEY_L)) state.ledAnimated=!state.ledAnimated;
     if(input.pressed(GLFW_KEY_C)) ++state.confettiRequest;
     state.focusSinger=input.down(GLFW_KEY_SPACE);
@@ -69,6 +98,9 @@ void run(GLFWwindow* window,const Options& opt) {
              <<"\nShaders: "<<opt.shaderDir.string()<<"\n";
     Input input(window,!opt.smoke);Camera camera;Scene scene;SceneState state;
     Renderer renderer(opt.shaderDir);Hud hud(opt.shaderDir);
+    Music music(opt.music);
+    state.musicBpm=opt.music.bpm;
+    state.audioAvailable=music.available();
     double previous=glfwGetTime(),fpsStart=previous,runStart=previous;int fpsFrames=0,frames=0;
     float fps=0;
     std::cout<<"TAB releases mouse. H toggles controls. ESC quits.\n";
@@ -76,7 +108,10 @@ void run(GLFWwindow* window,const Options& opt) {
         input.poll();controls(input,state,camera,window);
         double now=glfwGetTime();
         // Clamp long stalls so restoring a window does not jump the camera/particles.
-        float dt=static_cast<float>(std::clamp(now-previous,0.0,0.1));previous=now;
+        const double elapsed=std::max(0.0,now-previous);
+        float dt=static_cast<float>(std::min(elapsed,0.1));previous=now;
+        music.update(state.paused,state.musicMuted,elapsed);
+        state.beatPulse=music.beatPulse();
         camera.update(input,dt);
         float animationDT=state.paused?0:dt;
         state.animationTime+=animationDT;scene.update(state,animationDT);
@@ -89,7 +124,7 @@ void run(GLFWwindow* window,const Options& opt) {
         ++fpsFrames;
         if(now-fpsStart>=0.5) {
             fps=static_cast<float>(fpsFrames/(now-fpsStart));fpsFrames=0;fpsStart=now;
-            std::string title="Concert Stage | "+std::to_string(static_cast<int>(fps))+" FPS | Scaffold";
+            std::string title="Concert Stage | "+std::to_string(static_cast<int>(fps))+" FPS";
             glfwSetWindowTitle(window,title.c_str());
         }
         hud.draw(width,height,fps,state);
@@ -115,11 +150,12 @@ int main(int argc,char** argv) {
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,3);glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,3);
         glfwWindowHint(GLFW_OPENGL_PROFILE,GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT,GLFW_TRUE);
+        glfwWindowHint(GLFW_SAMPLES,4);
         // Use real 1280x720 framebuffer pixels on Retina for the initial performance check.
 #ifdef __APPLE__
         glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER,GLFW_FALSE);
 #endif
-        window=glfwCreateWindow(config::windowWidth,config::windowHeight,"Concert Stage | Scaffold",nullptr,nullptr);
+        window=glfwCreateWindow(config::windowWidth,config::windowHeight,"Concert Stage",nullptr,nullptr);
         if(!window) throw std::runtime_error("Cannot create an OpenGL 3.3 core window");
         glfwMakeContextCurrent(window);glfwSwapInterval(1);
         run(window,opt);

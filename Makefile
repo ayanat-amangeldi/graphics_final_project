@@ -2,12 +2,12 @@
 CXX = clang++
 CPPFLAGS += -Iinclude $(shell pkg-config --cflags glfw3)
 CXXFLAGS += -std=c++17 -O2 -Wall -Wextra -Wpedantic
-LDFLAGS += $(shell pkg-config --libs glfw3) -framework OpenGL
+LDFLAGS += $(shell pkg-config --libs glfw3) -framework OpenGL -framework CoreFoundation -framework CoreAudio -framework AudioToolbox
 SOURCES := $(wildcard src/*.cpp src/scene/*.cpp)
 OBJECTS := $(patsubst src/%.cpp,build/make/%.o,$(SOURCES))
 TARGET := build/make/concert_stage
 
-.PHONY: all run test smoke clean
+.PHONY: all run run-danza test smoke clean
 all: $(TARGET)
 
 $(TARGET): $(OBJECTS) $(wildcard shaders/*.vert shaders/*.frag)
@@ -21,6 +21,9 @@ build/make/%.o: src/%.cpp
 
 run: $(TARGET)
 	./$(TARGET)
+
+run-danza: $(TARGET)
+	./$(TARGET) --music build/local-music/danza-kuduro.wav --music-start 36 --music-bpm 130 --beat-offset 0.19
 
 build/make/math_tests: tests/math_tests.cpp $(wildcard include/concert/*.hpp)
 	mkdir -p build/make

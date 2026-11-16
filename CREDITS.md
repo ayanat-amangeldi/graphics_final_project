@@ -7,10 +7,13 @@
   - License: zlib/libpng, retained verbatim in `third_party/glfw/LICENSE.md`.
   - Source is included unchanged apart from omitting repository metadata and GitHub configuration. It is built by CMake with documentation, examples and tests disabled. No binary dependency is committed.
 
+- **miniaudio 0.11.23**, David Reid (mackron), [upstream source](https://github.com/mackron/miniaudio/tree/0.11.23). We use the MIT No Attribution option in the included `third_party/miniaudio/LICENSE`. The header is included unchanged. The [official playback documentation](https://miniaud.io/docs/manual/index.html) informed use of the device callback.
+- **120 BPM instrumental loop**. Original synthesized kick, clap, hi-hat, bass, and pluck parts generated at runtime by project code in `src/Music.cpp` with help from OpenAI Codex. No imported recording or samples.
+
 ## Project code and visuals
 
 - Starter C++ code, GLSL shaders, simple 5x7 HUD glyphs and documentation: generated with OpenAI Codex for this team; see README AI Use Note. No tutorial code or external artwork was copied into these files.
-- Current scene uses procedurally constructed unit cubes. There are no downloaded models, textures, audio tracks or external fonts in the application.
+- Current scene uses procedurally constructed unit cubes. There are no downloaded models, textures, or external fonts in the application.
 - Existing Assignment 3 in the user's workspace informed the compatible macOS compiler/GLFW setup; no assignment implementation was copied into the starter.
 
 ## Technical documentation consulted
