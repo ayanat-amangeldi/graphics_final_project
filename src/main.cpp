@@ -56,7 +56,6 @@ Options options(int argc,char** argv) {
         throw std::runtime_error("--screenshot requires --smoke-test");
     if(!r.shaderDir.empty()) return r;
     std::vector<std::filesystem::path> roots;
-    // Prefer shaders beside the executable, then the project working directory.
     roots.push_back(std::filesystem::absolute(argv[0]).parent_path()/"shaders");
     roots.push_back(std::filesystem::current_path()/"shaders");
 #ifdef CONCERT_SOURCE_DIR
@@ -107,7 +106,6 @@ void run(GLFWwindow* window,const Options& opt) {
     while(!glfwWindowShouldClose(window)) {
         input.poll();controls(input,state,camera,window);
         double now=glfwGetTime();
-        // Clamp long stalls so restoring a window does not jump the camera/particles.
         const double elapsed=std::max(0.0,now-previous);
         float dt=static_cast<float>(std::min(elapsed,0.1));previous=now;
         music.update(state.paused,state.musicMuted,elapsed);
@@ -137,7 +135,6 @@ void run(GLFWwindow* window,const Options& opt) {
         if(smokeDone) glfwSetWindowShouldClose(window,GLFW_TRUE);
     }
     if(opt.smoke) std::cout<<"SMOKE PASS: "<<frames<<" frames; shaders linked; no OpenGL errors.\n";
-    // Local GPU resources are destroyed before returning to main's context cleanup.
 }
 }
 int main(int argc,char** argv) {
@@ -151,7 +148,6 @@ int main(int argc,char** argv) {
         glfwWindowHint(GLFW_OPENGL_PROFILE,GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT,GLFW_TRUE);
         glfwWindowHint(GLFW_SAMPLES,4);
-        // Use real 1280x720 framebuffer pixels on Retina for the initial performance check.
 #ifdef __APPLE__
         glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER,GLFW_FALSE);
 #endif

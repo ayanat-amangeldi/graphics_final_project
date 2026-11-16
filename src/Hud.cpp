@@ -5,7 +5,6 @@
 
 namespace concert {
 namespace {
-// Original 5x7 bitmap alphabet, rendered as indexed triangles in the core pipeline.
 const std::map<char,const char*> glyphs={
  {'A',"01110/10001/10001/11111/10001/10001/10001"},
  {'B',"11110/10001/10001/11110/10001/10001/11110"},
@@ -58,7 +57,7 @@ void quad(std::vector<Vertex>& v,std::vector<unsigned int>& i,float x,float y,fl
 }
 }
 void Hud::draw(int width,int height,float fps,const SceneState& state) {
-    
+
     std::ostringstream out;
 
     out << "CONCERT STAGE"

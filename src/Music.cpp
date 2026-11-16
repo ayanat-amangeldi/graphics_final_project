@@ -47,7 +47,6 @@ std::vector<float> makeLoop() {
         const float highNoise = (noise - previousNoise) * 0.5f;
         previousNoise = noise;
 
-        // Four-on-the-floor kick, clap on beats two and four, offbeat hi-hat.
         const float kickPhase = tau * (48 * beatTime + 2.7f * (1 - std::exp(-39 * beatTime)));
         const float kick = 0.46f * std::sin(kickPhase) * envelope(beatTime, 0.003f, 10, 0.34f);
         const float clap = beat % 2 == 1
@@ -86,7 +85,6 @@ std::vector<float> loadTrack(const MusicTrack& track) {
     if (length < sampleRate / 5 || length > UINT32_MAX)
         throw std::runtime_error("Invalid music segment length.");
 
-    // Loop over a whole number of beats and soften the splice at both ends.
     const auto* pcm = static_cast<const float*>(audio.get());
     std::vector<float> samples(pcm + start, pcm + start + length);
     constexpr std::size_t fade = sampleRate / 40;

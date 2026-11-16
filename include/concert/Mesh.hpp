@@ -12,7 +12,7 @@ public:
     Mesh(const Mesh&)=delete;
     Mesh& operator=(const Mesh&)=delete;
     void draw() const;
-    static Mesh cube(); // Unit cube centred at the local origin; full face normals and UVs.
+    static Mesh cube();
 private:
     gl::UInt vao_=0,vbo_=0,ebo_=0;
     gl::Size count_=0;

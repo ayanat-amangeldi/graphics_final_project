@@ -43,8 +43,6 @@ void LightShow::update(const SceneState& state, float dt) {
         const float yaw = std::atan2(-aim.x, -aim.z);
         const float tilt = std::atan2(std::hypot(aim.x, aim.z), -aim.y);
 
-        // Local -Y is the optical axis. The lens lies on that axis, so its
-        // offset from the tilt pivot does not change the aiming direction.
         pose.mount = translation(anchor);
         pose.yoke = pose.mount * translation({0, -0.42f, 0}) * rotationY(yaw);
         pose.head = pose.yoke * rotationX(tilt);
@@ -54,7 +52,6 @@ void LightShow::update(const SceneState& state, float dt) {
                                             : preset.colors[(i + i / 3) % 2];
         const float inner = state.focusSinger ? 4.0f : preset.innerAngle;
         const float outer = state.focusSinger ? 8.0f : preset.outerAngle;
-        // Keep the performer readable during focus, with a gentler pulse.
         const float pulse = state.focusSinger ? 0.91f + 0.14f * state.beatPulse
                                              : 0.63f + 0.46f * state.beatPulse;
         lights_[i] = {lens, direction, color, std::cos(radians(inner)),

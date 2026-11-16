@@ -9,7 +9,7 @@ struct Spotlight {
     vec3 position;
     vec3 direction;
     vec3 color;
-    vec3 params; // outer cosine, inner cosine, intensity
+    vec3 params;
 };
 uniform Spotlight uSpotlights[6];
 uniform int uGrid;
@@ -31,7 +31,6 @@ vec3 lightContribution(Spotlight light,vec3 albedo,vec3 n,vec3 viewDir) {
 void main() {
     vec3 albedo=uColor;
     if(uGrid!=0) {
-        // One-metre world-space grid, with derivative-based antialiasing.
         vec2 uv=vWorldPosition.xz;
         vec2 distanceToLine=abs(fract(uv-0.5)-0.5);
         vec2 pixelWidth=max(fwidth(uv),vec2(0.0001));
@@ -39,7 +38,6 @@ void main() {
         albedo=mix(albedo,vec3(0.10,0.13,0.20),line*0.26);
     }
     vec3 n=normalize(vNormal),viewDir=normalize(uCamera-vWorldPosition);
-    // A soft wash keeps silhouettes legible between moving spotlights.
     float fill = max(dot(n, normalize(vec3(0.15, 0.48, 1.0))), 0.0);
     vec3 result = albedo * (vec3(0.13, 0.15, 0.22) + vec3(0.35, 0.38, 0.49) * fill);
     for (int i = 0; i < 6; ++i) {

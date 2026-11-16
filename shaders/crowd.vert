@@ -26,8 +26,6 @@ void main() {
     float phase = aInstanceStyle.w;
     float idle = sin(uAnimationTime * 1.15 + phase);
 
-    // Arm geometry is tagged 1 (left) and 2 (right). Rotate around each
-    // shoulder so waving happens independently within the shared mesh.
     if (vPart == 1 || vPart == 2) {
         bool selectedArm = (vPart == 1 && gl_InstanceID % 5 == 0) ||
                            (vPart == 2 && gl_InstanceID % 5 == 2);
@@ -41,7 +39,6 @@ void main() {
         normal.xy = armRotation * normal.xy;
     }
 
-    // A small per-person lean creates a gentle side-to-side sway.
     float sway = 0.035 * idle;
     vec2 body = position.xy - vec2(0.0, 0.75);
     mat2 swayRotation = mat2(cos(sway), sin(sway), -sin(sway), cos(sway));
@@ -49,7 +46,6 @@ void main() {
     normal.xy = swayRotation * normal.xy;
     vNormal = normalize(mat3(model) * normal);
 
-    // Legs stay planted while the upper body bounces on the shared beat.
     const float variation = 0.06;
     float bounce = (0.10 + variation * (0.5 + 0.5 * sin(phase))) * uBeatPulse;
     position.y += bounce * smoothstep(0.0, 1.15, aPosition.y);

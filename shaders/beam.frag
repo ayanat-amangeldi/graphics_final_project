@@ -12,7 +12,6 @@ void main() {
     vec3 towardCamera = uCamera - vWorldPosition;
     towardCamera /= max(length(towardCamera), 0.0001);
     float facing = abs(dot(normalize(vNormal), towardCamera));
-    // Fade the cone walls at the silhouette and its ends.
     float opacity = uOpacity * smoothstep(0.0, 0.55, facing)
                     * smoothstep(0.0, 0.04, vUV.y)
                     * (1.0 - smoothstep(0.73, 1.0, vUV.y));

@@ -1,64 +1,39 @@
 # Concert Stage
 
-Общий стартовый каркас финального проекта Computer Graphics Fundamentals для команды из четырёх человек. C++17, OpenGL 3.3 core, GLFW и собственные GLSL-шейдеры. Репозиторий: https://github.com/ayanat-amangeldi/graphics_final_project
+Concert Stage is our real-time 3D project for Computer Graphics Fundamentals. We built a small concert venue in C++17 with OpenGL 3.3 Core and separate GLSL vertex and fragment shaders. GLFW handles the window and input, and miniaudio handles playback.
 
-Сцена включает группу, анимированный LED-экран, зрителей через instancing, конфетти и световое шоу.
+## Features
 
-## Что уже есть
+- A low-poly venue with a stage, light trusses, loudspeakers, amplifiers, a guitarist, a drummer, and a singer who walks across the stage with a handheld microphone.
+- Six moving spotlights with three presets. Each light rig is built as a mount, a rotating yoke, and a tilting head. Holding Space makes all six lights track the singer.
+- Per-fragment Blinn–Phong lighting, translucent light beams, a procedural floor grid, and an animated LED screen.
+- A crowd of 120 spectators drawn with GPU instancing. Spectators sway, wave, and bounce with the music.
+- Confetti emitted from both sides of the stage, a built-in instrumental loop at 120 BPM, and beat-driven spotlight intensity.
+- A free camera, an on-screen FPS counter, and an in-window control guide.
 
-- Окно 1280x720, depth test, back-face culling, VAO/VBO/EBO.
-- Индексированный куб с нормалями и UV, буферы геометрии загружаются один раз.
-- Шейдеры в отдельных `.vert` / `.frag`; ошибки компиляции и линковки выводятся в терминал.
-- Model / view / projection, правильная normal matrix для неравномерного масштаба.
-- Шесть движущихся прожекторов. Фрагментный шейдер Blinn–Phong вычисляет освещение с мягкой границей конуса и затуханием по расстоянию. Видимые лучи отрисовываются отдельным полупрозрачным проходом.
-- Свободная камера, управление с учётом deltaTime, безопасная потеря фокуса окна.
-- Единый ввод, общая пауза, состояние пресетов и запросы будущих эффектов.
-- FPS в заголовке окна и подсказки внутри окна.
-- Синтезированный инструментальный луп 120 BPM. Прожекторы пульсируют, а зрители двигаются в такт. Фаза удара вычисляется по числу аудиосэмплов, обработанных callback miniaudio.
-- Подиум, фермы, музыканты с инструментами, зрители, конфетти и анимированный экран. Певец ходит по сцене, держа ручной микрофон.
-- Иерархия прожектора: крепление → поворотная рама → наклонная головка. Направление света вычисляется из матрицы головки.
-- CMake для macOS/Windows, macOS Makefile и VS Code tasks.
+## Build and run
 
-## Как открыть проект
-
-Если репозиторий ещё не клонирован:
+The application requires an OpenGL 3.3 Core-capable graphics driver and a C++17 toolchain. The commands below run from the repository root. A clean checkout plays the built-in instrumental loop. CMake builds the bundled GLFW by default, and miniaudio is compiled into the application.
 
 ```sh
 git clone https://github.com/ayanat-amangeldi/graphics_final_project.git
 cd graphics_final_project
 ```
 
-В VS Code выберите File → Open Folder и откройте **саму папку graphics_final_project**, где лежит этот README. Если локальная копия уже есть, повторно клонировать её не нужно. Установите рекомендованные расширения Microsoft C/C++ и CMake Tools. Расширения не заменяют компилятор и CMake.
+### macOS with Make
 
-## macOS
-
-Нужны Xcode Command Line Tools. Если они ещё не установлены:
+This is our assignment-style build with Apple Clang, GLFW, and pkg-config. Xcode Command Line Tools are required. The Homebrew command supplies GLFW and pkg-config if they are absent.
 
 ```sh
-xcode-select --install
-```
-
-### Вариант 1 — как в Assignment 3
-
-Если GLFW и pkg-config уже использовались в заданиях:
-
-```sh
+brew install glfw pkg-config
 make
 make test
 make run
 ```
 
-Если отсутствуют GLFW/pkg-config, при наличии Homebrew:
+### macOS with CMake
 
-```sh
-brew install glfw pkg-config
-```
-
-Этот вариант создаёт `build/make/concert_stage` и использует системный GLFW.
-
-### Вариант 2 — общая CMake-сборка
-
-Нужен CMake 3.16+ (`brew install cmake`, если используете Homebrew). GLFW уже включён в репозиторий и собирается автоматически:
+This build requires Xcode Command Line Tools and CMake 3.21 or later for the commands below. With Homebrew, CMake can be installed with `brew install cmake`.
 
 ```sh
 cmake -S . -B build/cmake -DCMAKE_BUILD_TYPE=Release
@@ -67,11 +42,9 @@ ctest --test-dir build/cmake -C Release --output-on-failure
 ./build/cmake/concert_stage
 ```
 
-## Windows
+### Windows with CMake
 
-Рекомендуемая конфигурация: Visual Studio Build Tools **2022** с workload **Desktop development with C++**, Windows SDK и CMake 3.21+. Писать код продолжаете в VS Code; Build Tools предоставляет компилятор MSVC. Если уже есть рабочая настройка курса с другим компилятором, согласуйте её перед установкой второго toolchain.
-
-Перезапустите VS Code после установки инструментов. В его терминале PowerShell, из корня репозитория:
+This build targets x64 and uses Visual Studio 2022 Build Tools with the Desktop development with C++ workload, Windows SDK, and CMake 3.21 or later. The commands are for PowerShell.
 
 ```powershell
 cmake -S . -B build/cmake -G "Visual Studio 17 2022" -A x64
@@ -80,98 +53,66 @@ ctest --test-dir build/cmake -C Release --output-on-failure
 .\build\cmake\Release\concert_stage.exe
 ```
 
-Отдельно скачивать GLFW, GLAD, DLL или настраивать include-пути не нужно: GLFW собирается статически из `third_party/glfw`, функции OpenGL загружает небольшой модуль проекта через GLFW. Нужен видеодрайвер с поддержкой OpenGL 3.3+; если окно не создаётся, сохраните сообщение из терминала.
+## Controls
 
-## VS Code
-
-- Terminal → Run Build Task запускает `Concert: build` через CMake.
-- Terminal → Run Task → `Concert: test maths` проверяет матрицы и координаты.
-- На Mac с настройкой A3 можно выбрать `Concert: make on macOS`.
-- При использовании CMake Tools выберите компилятор через `CMake: Select a Kit`, затем `CMake: Configure`, `CMake: Build` и `CMake: Run Without Debugging` для target `concert_stage`.
-- Не запускайте проект кнопкой Code Runner / Run Code: компилировать только `main.cpp` недостаточно.
-- Если меняете компилятор или генератор, используйте новую build-папку или `CMake: Delete Cache and Reconfigure`.
-
-## Управление
-
-При обычном запуске мышь захвачена. Tab освобождает её и снова включает управление. При потере фокуса окна курсор освобождается; нажмите Tab после возвращения.
-
-| Клавиша | Сейчас работает |
+| Input | Action |
 | --- | --- |
-| WASD, мышь | Перемещение и обзор |
-| Q / E | Вниз / вверх |
-| Shift | Быстрое движение |
-| Tab | Захват / освобождение мыши |
-| R | Начальная позиция камеры |
-| 1 / 2 / 3 | Синий и фиолетовый медленный режим / розовый и голубой быстрый режим / золотой и оранжевый режим с перекрёстными лучами |
-| Удержание Space | Все шесть прожекторов следуют за движущимся певцом. При отпускании возвращается выбранный режим |
-| C | Запуск конфетти |
-| M | Выключить или вернуть звук. Ритм света и зрителей сохраняется |
-| L | Включение и остановка анимации LED |
-| P | Пауза музыки и анимации сцены. Камера остаётся активной |
-| H | Показать / скрыть подробные подсказки |
-| Esc | Закрыть окно |
+| W / A / S / D | Move the camera |
+| Mouse | Look around while the cursor is captured |
+| Q / E | Lower or raise the camera |
+| Shift | Move faster |
+| Tab | Toggle cursor capture |
+| R | Reset the camera |
+| 1 / 2 / 3 | Select the slow blue and violet, fast pink and cyan, or crossed gold and orange light pattern |
+| Hold Space | Aim all six spotlights at the moving singer. Releasing Space restores the selected pattern |
+| C | Release confetti |
+| L | Toggle LED screen animation |
+| M | Mute or restore audio while the beat continues |
+| P | Pause or resume the music and scene animation. The camera remains active |
+| H | Show or hide control help |
+| Esc | Close the application |
 
-Финальное поведение зарезервированных клавиш описано в [договорённостях команды](docs/TEAM_CONTRACT.md).
+## Audio
 
-## Своя музыка
+The shared version uses our synthesized 120 BPM instrumental. The visual beat is derived from the audio playback position and drives both spotlight intensity and audience motion. The executable also accepts local WAV or MP3 files through `--music FILE`, with optional `--music-start SEC`, `--music-bpm BPM`, and `--beat-offset SEC` arguments.
 
-По умолчанию играет встроенный луп 120 BPM. Для локального трека используйте WAV или MP3:
+Our local demonstration configuration uses *Danza Kuduro* by Don Omar and Lucenzo from 00:36 at 130 BPM. The recording is stored locally and excluded from Git. The GitHub version includes the synthesized loop as its default soundtrack.
 
-```sh
-./build/make/concert_stage --music "/path/to/track.wav" --music-start 36 --music-bpm 130 --beat-offset 0.19
-```
+## Project structure
 
-`--music-start` задаёт позицию начала воспроизведения в исходном файле. `--beat-offset` задаёт время следующего удара относительно этой позиции. Для локальной копии Danza Kuduro с указанными настройками на macOS можно выполнить `make run-danza`, если WAV лежит в `build/local-music/danza-kuduro.wav`. Ветка распространяется со встроенным лупом. Локальный WAV в `build/` игнорируется Git.
+| Path | Responsibility |
+| --- | --- |
+| [src/main.cpp](src/main.cpp) | OpenGL setup, input dispatch, frame timing, and the render loop |
+| [include/concert](include/concert) | Interfaces for Shader, Mesh, Camera, Renderer, Scene, and Music, plus scene configuration and transform math |
+| [src/scene](src/scene) | Venue, performers, spotlight rigs, audience, confetti, and LED screen |
+| [shaders](shaders) | Lighting, procedural textures, beam blending, instanced effects, and HUD rendering |
+| [src/Music.cpp](src/Music.cpp) | Loop synthesis, local audio decoding, playback, and beat timing |
+| [tests](tests) | Checks for transforms, projection, and scene coordinates |
+| [docs](docs) | Runtime verification and scene architecture |
+| [third_party](third_party) | GLFW and miniaudio source and licenses |
 
-## Проверка перед началом работы
+Procedural texturing is handled by the floor and LED fragment shaders. The shader programs, indexed geometry, and camera logic have their own modules.
 
-Каждый проходит [FIRST_RUN_CHECKLIST](docs/FIRST_RUN_CHECKLIST.md) на своём компьютере. Наличие общей CMake-конфигурации не заменяет проверку Windows.
+## Team contributions
 
-Для автоматической проверки контекста, шейдеров и отрисовки запустите программу с `--smoke-test`. Она нарисует минимум 120 кадров, проработает минимум секунду и закроется сама:
+| Contributor | Contributions |
+| --- | --- |
+| Ayanat Amangeldi | Shared application scaffold, build setup, spotlight rigs and singer tracking, venue polish, singer walk cycle, and music synchronization |
+| Aruzhan Turaly | Stage layout, trusses, speakers, scene equipment, musicians, and instruments |
+| `kerimbayzarina` | Instanced audience, spectator motion, and the confetti particle system |
+| `haweeks` | Animated LED screen and HUD improvements |
 
-```sh
-./build/make/concert_stage --smoke-test
-```
+## Verification
 
-Для CMake замените путь на свой executable; на Windows это `.\build\cmake\Release\concert_stage.exe --smoke-test`.
-
-Дополнительный параметр `--screenshot build/preview.ppm` сохраняет последний кадр smoke test в PPM. Это средство проверки, а не замер финальной производительности. Запускайте тест в обычной графической сессии, с неминимизированным окном.
-
-Шейдеры копируются рядом с исполняемым файлом при сборке. После изменения шейдеров снова выполните build. Параметр `--shader-dir PATH` позволяет явно выбрать другую папку шейдеров. Если переносите executable, переносите рядом и папку `shaders`.
-
-## Распределение работы
-
-| Участник | Модули | Дальнейшая задача |
-| --- | --- | --- |
-| Участник 1 — автор каркаса, вписать имя | `src/scene/LightShow.cpp`, освещение в Renderer и scene.frag | Настоящие spotlights, иерархия, пресеты, наведение на певца |
-| Участник 2 — вписать имя | `src/scene/Stage.cpp` | Сцена, музыканты, инструменты и фермы |
-| Участник 3 — вписать имя | `src/scene/Crowd.cpp` | Instancing 120 зрителей и конфетти |
-| Участник 4 — вписать имя | `src/scene/LedScreen.cpp`, новые LED-шейдеры, Hud | Анимированный экран и развитие интерфейса, проверка камеры |
-
-Общие заголовки и Renderer меняем по договорённости. Не создаём по отдельному `main()` и окну в каждой части.
-
-## Совместная работа с Git
-
-Первый каркас пока подготовлен локально. До commit проверьте список файлов: `build/` и исполняемые файлы не должны попадать в репозиторий. Для первого commit откройте Source Control в VS Code, проверьте изменения, сделайте Stage, Commit и Push под своим аккаунтом. Если Git просит имя/email, укажите собственные данные.
-
-После публикации каркаса каждый создаёт ветку от актуального `main`, например:
+The macOS Make build, math tests, and OpenGL smoke test were verified on an Apple M4 Mac. The smoke test opens the scene, checks for OpenGL errors while rendering, and exits automatically. The [runtime checklist](docs/FIRST_RUN_CHECKLIST.md) covers manual controls and FPS measurements at 1280 × 720.
 
 ```sh
-git switch main
-git pull --ff-only origin main
-git switch -c feature/spotlights
+make test
+make smoke
 ```
 
-Остальные ветки: `feature/stage`, `feature/crowd`, `feature/led-ui`. Коммитим свою работу регулярно со своего аккаунта. После push открываем pull request; другой участник проверяет сборку и код, затем изменения объединяются в main. Обновляйте свою feature-ветку изменениями из main и разбирайте конфликты до merge.
+## Credits and AI use
 
-## AI Use Note
+[CREDITS.md](CREDITS.md) records third-party libraries, licenses, and audio provenance. We used OpenAI Codex to help prepare the shared scaffold and documentation and to assist with the spotlight and beam shaders, visual polish, singer animation, instrumental synthesis, and beat synchronization.
 
-Общий стартовый каркас создан с помощью OpenAI Codex: структура C++-проекта, CMake/Makefile, камера и ввод, базовые шейдеры, модульные заглушки, тесты и инструкции. GLFW взят из официального репозитория и не сгенерирован AI. Команда должна проверить код, понять его и дописать собственные модули. По мере работы обновляйте эту заметку: какие инструменты использовались, для чего и что каждый участник изменил и проверил. Не заявляйте ещё не выполненные изменения и проверки.
-
-Для модуля светового шоу OpenAI Codex помог реализовать расчёт движения и наведения, GLSL-освещение и отрисовку лучей, а также проверить режимы на macOS.
-
-OpenAI Codex помог реализовать синтез инструментального лупа, воспроизведение в miniaudio, расчёт общей фазы ритма, синхронизацию толпы с прожекторами, иерархическую походку певца и отслеживание его позиции прожекторами.
-
-## Источники и лицензии
-
-См. [CREDITS.md](CREDITS.md). Документация по сборке: [GLFW](https://www.glfw.org/docs/latest/build.html), [VS Code CMake](https://code.visualstudio.com/docs/cpp/cmake-quickstart), [C++ в VS Code](https://code.visualstudio.com/docs/languages/cpp). Это технические источники; они не заменяют 15 журнальных источников для literature review.
+We wrote our own explanations of how the project works and used OpenAI Codex to suggest clearer, more academic English. We reviewed those suggestions and kept the wording that accurately described our implementation. We assembled the report ourselves in Microsoft Word and manually captured and inserted screenshots of the source code and the running application. Our use of AI for the report was limited to editing selected passages. The team prepared the complete document in Word.

@@ -1,69 +1,16 @@
-# Договорённости команды
+# Scene Architecture
 
-## Общая система координат
+The scene uses right-handed world coordinates. Positive X points right from the audience view, positive Y points up, and positive Z points from the stage toward the audience. [Config.hpp](../include/concert/Config.hpp) defines the stage dimensions, camera settings, fixture mounts, audience layout, and confetti emitters.
 
-Правосторонняя система; +X вправо при взгляде из зала, +Y вверх, +Z от сцены к зрителям. Одна единица примерно равна метру. Все углы в коде в радианах; `radians()` переводит градусы.
-
-Числовой источник истины — `include/concert/Config.hpp`. Размеры и координаты меняем там по согласованию команды.
-
-| Объект | Координаты и размеры |
+| Module | Responsibility |
 | --- | --- |
-| Подиум | Центр (0, 0.5, 0), размеры (16, 1, 8), верх Y=1, перед Z=4 |
-| Пол зала | Верх Y=0, размеры 40x40, центр по XZ (0, 8) |
-| Певец | Ноги (0, 1, 2), точка наведения света (0, 2.4, 2) |
-| Гитаристы | Ноги (-4, 1, 0), (4, 1, 0) |
-| Барабанщик | Ноги (0, 1, -2) |
-| LED | Центр (0, 4, -3.8), лицевая плоскость 10x4, направлена к +Z |
-| Крепления света | X=-6,0,6; Y=7; Z=-3 и +3, всего 6 |
-| Зрители | 12 колонок x 10 рядов, X от -10 до 10, Z от 7 до 22, ноги Y=0 |
-| Конфетти | Начало (-6, 5, 2), (6, 5, 2) |
-| Камера | Начало (0, 3, 16), взгляд на (0, 2.5, 0), FOV 60 градусов |
-| Проекция | Near 0.1, far 100; aspect по размеру framebuffer |
+| Stage | Draws the venue, equipment, and band. The singer's pose defines the torso and limb transforms |
+| LightShow | Updates six fixtures and uploads their positions, directions, colors, and cone parameters. Singer focus uses the same pose calculation as the stage |
+| Crowd | Supplies 120 spectator instances and updates the confetti simulation |
+| LedScreen | Advances the LED animation clock when animation is enabled and submits the screen draw |
+| Renderer | Owns GPU resources and renders the scene, instanced crowd and confetti, LED screen, and translucent beams |
+| Music | Reproduces the loop or an optional local track and supplies the beat pulse for the crowd and lights |
 
-Модель персонажа: локальный origin между ступнями, высота около 1.8, лицевая сторона +Z. Зрителей при размещении поворачиваем к сцене. Куб Mesh::cube имеет размер 1 и origin в центре: для ног на Y=0 тело высотой 1.8 размещаем центром на Y=0.9.
+Matrices are column-major and the pipeline applies projection × view × model to each vertex. A child transform is composed as parent × local. The scene shader transforms normals with the inverse transpose of the model matrix before evaluating lighting in world space.
 
-## Преобразования и шейдеры
-
-- Матрицы column-major, вектор справа. `model = parent * local`; `local = T * R * S`.
-- Координаты освещения и камеры в `scene.frag` — world space.
-- Нормали преобразуем через inverse-transpose model matrix; не допускаем нулевой масштаб.
-- Атрибуты mesh: location 0 position vec3, 1 normal vec3, 2 UV vec2.
-- Один GLFW/OpenGL context на главном потоке. GPU-ресурсы создаём после загрузки GL и удаляем до закрытия context.
-- У каждого эффекта могут быть свои шейдеры. Не встраиваем GLSL в C++ строки.
-- Статические meshes и instance transforms загружаем один раз, а не каждый кадр.
-
-## Подключение частей
-
-`main.cpp` управляет циклом, вводом, временем, камерой и временем жизни ресурсов. `Scene` вызывает четыре модуля. Каждый модуль должен встраиваться в этот цикл.
-
-- `Stage::draw(Renderer&, const SceneState&)`: геометрия сцены и группы.
-- `LightShow::update(...)`: расчёт будущих rig poses; `configure(...)` вызывается перед всей геометрией и должен передавать свет в Renderer; `draw(...)` пока рисует корпуса-маркеры.
-- `Crowd::update(const SceneState&, float dt)` и `draw(...)`: будущие instances и particles.
-- `LedScreen::draw(...)`: будущий собственный шейдер экрана. Для остановки LED по L заведите отдельный clock, который растёт только при `ledAnimated && !paused`.
-- `SceneState` содержит `preset`, `paused`, `focusSinger`, `ledAnimated`, `confettiRequest`, `animationTime`.
-
-Модули получают команды через SceneState и не читают клавиатуру сами. Изменения интерфейсов в `Scene.hpp`, `Renderer.hpp` и `State.hpp` заранее обсуждаем. Если нужны дополнительные update/init методы, добавляем их через общий PR и обновляем этот договор.
-
-## Время и ввод
-
-`dt` в секундах, ограничен сверху 0.1 после долгих задержек. Camera получает реальный dt даже на паузе. Scene получает `dt=0` на паузе; `animationTime` тогда не растёт. Для будущей музыки паузу аудио нужно реализовать отдельно.
-
-События переключений работают один раз на GLFW_PRESS, удержание — через `Input::down()`. Потеря фокуса очищает удержанные клавиши и освобождает курсор. На паузе запрос C можно поставить в очередь, но частицы не должны двигаться до возобновления.
-
-| Клавиша | Итоговое назначение |
-| --- | --- |
-| WASD / мышь | Камера |
-| Q/E / Shift | Вниз-вверх / ускорение |
-| Tab / R | Курсор / сброс камеры |
-| 1 | Синий и фиолетовый, медленный рисунок |
-| 2 | Розовый и голубой, быстрый рисунок |
-| 3 | Золотой и оранжевый, перекрёстный рисунок |
-| Space удерживать | Все spotlights на певца; отпустить — обратно к пресету |
-| C | Одна порция конфетти |
-| L | Анимация LED on/off |
-| P | Пауза всей анимации, камера активна |
-| H / Esc | Подсказки / выход |
-
-## Условия начала параллельной разработки
-
-Каждый запускает каркас, проходит FIRST_RUN_CHECKLIST и сообщает результат с указанием ОС. После первого общего commit и push ветки создаются от main. Первое объединение делаем с одним рабочим примером от каждого модуля, затем наращиваем детали. Сохраняем в README имена, вклад и AI Use; источники и лицензии — в CREDITS.
+The render loop handles GLFW input and publishes shared state to the scene. It computes camera movement from elapsed frame time. Pausing freezes the animation clock and audio progression while leaving camera movement available. The opaque scene is rendered before the translucent beams. Mesh geometry and crowd instance data are reused, while confetti instance data changes as the particles move.

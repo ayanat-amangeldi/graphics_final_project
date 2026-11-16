@@ -4,7 +4,6 @@
 #include <vector>
 
 namespace concert {
-// Each teammate owns one module and its source file. No GLFW calls in modules.
 class Stage {
 public: void draw(Renderer& renderer,const SceneState& state) const;
 };

@@ -8,13 +8,13 @@
   - Source is included unchanged apart from omitting repository metadata and GitHub configuration. It is built by CMake with documentation, examples and tests disabled. No binary dependency is committed.
 
 - **miniaudio 0.11.23**, David Reid (mackron), [upstream source](https://github.com/mackron/miniaudio/tree/0.11.23). We use the MIT No Attribution option in the included `third_party/miniaudio/LICENSE`. The header is included unchanged. The [official playback documentation](https://miniaud.io/docs/manual/index.html) informed use of the device callback.
-- **120 BPM instrumental loop**. Original synthesized kick, clap, hi-hat, bass, and pluck parts generated at runtime by project code in `src/Music.cpp` with help from OpenAI Codex. No imported recording or samples.
+- **120 BPM instrumental loop**. Original synthesized kick, clap, hi-hat, bass, and pluck parts generated at runtime by project code in `src/Music.cpp`.
 
 ## Project code and visuals
 
-- Starter C++ code, GLSL shaders, simple 5x7 HUD glyphs and documentation: generated with OpenAI Codex for this team; see README AI Use Note. No tutorial code or external artwork was copied into these files.
+- The [AI use note](README.md#credits-and-ai-use) documents assistance with the project code, assets, and documentation.
 - Current scene uses procedurally constructed unit cubes. There are no downloaded models, textures, or external fonts in the application.
-- Existing Assignment 3 in the user's workspace informed the compatible macOS compiler/GLFW setup; no assignment implementation was copied into the starter.
+- The course's Assignment 3 informed our macOS compiler and GLFW setup.
 
 ## Technical documentation consulted
 
@@ -23,4 +23,4 @@
 - Microsoft, CMake Tools quick start: https://code.visualstudio.com/docs/cpp/cmake-quickstart
 - Microsoft, C/C++ for Visual Studio Code: https://code.visualstudio.com/docs/languages/cpp
 
-Add each future asset or code snippet here with title, author, original URL, license and modifications. Reading technical documentation does not imply that its text or code is included in the project.
+The technical references document the tools used in the project.

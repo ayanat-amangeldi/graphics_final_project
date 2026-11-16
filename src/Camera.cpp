@@ -12,7 +12,6 @@ Vec3 Camera::forward() const {
     return {std::cos(yaw_)*std::cos(pitch_),std::sin(pitch_),std::sin(yaw_)*std::cos(pitch_)};
 }
 void Camera::update(const Input& input,float dt) {
-    // Mouse displacement already measures movement; do not multiply it by dt.
     yaw_+=static_cast<float>(input.mouseDX)*0.0025f;
     pitch_=std::clamp(pitch_-static_cast<float>(input.mouseDY)*0.0025f,radians(-89),radians(89));
     Vec3 f=forward(),right=normalize(cross(f,{0,1,0})),movement{};

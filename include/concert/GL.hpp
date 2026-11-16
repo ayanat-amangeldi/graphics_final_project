@@ -1,6 +1,4 @@
 #pragma once
-// Small project-owned OpenGL 3.3 loader. GLFW supplies the platform addresses.
-// No platform GL headers, GLAD download or generated third-party code needed.
 #include <cstddef>
 #if defined(_WIN32)
 #define CONCERT_GL_CALL __stdcall

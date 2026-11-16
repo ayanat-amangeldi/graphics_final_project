@@ -13,7 +13,7 @@ using Spotlights = std::array<Spotlight, config::rigAnchors.size()>;
 
 struct CrowdInstance {
     Mat4 model;
-    float color[4]{}; // RGB clothing color and stable animation phase.
+    float color[4]{};
 };
 struct ConfettiInstance {
     Vec3 position,color;

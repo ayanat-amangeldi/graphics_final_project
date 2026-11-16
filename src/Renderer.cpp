@@ -41,8 +41,6 @@ Renderer::Renderer(const std::filesystem::path& path)
      ledShader_(path/"led.vert",path/"led.frag"),cube_(Mesh::cube()),
      crowdShader_(path/"crowd.vert",path/"crowd.frag"),
      confettiShader_(path/"confetti.vert",path/"confetti.frag") {
-    // One combined low-poly spectator mesh: head, torso, arms and legs are
-    // separate box shapes packed into this single indexed mesh.
     struct CrowdVertex { Vec3 position,normal;float u,v; };
     std::vector<CrowdVertex> vertices;
     std::vector<unsigned int> indices;
@@ -59,12 +57,12 @@ Renderer::Renderer(const std::filesystem::path& path)
             for(unsigned int i:{0u,1u,2u,0u,2u,3u}) indices.push_back(start+i);
         }
     };
-    appendBox({0,0.91f,0},{0.38f,0.54f,0.24f},0); // torso
-    appendBox({0,1.49f,0},{0.32f,0.34f,0.32f},3); // head
-    appendBox({-0.29f,0.94f,0},{0.17f,0.48f,0.19f},1); // left arm
-    appendBox({ 0.29f,0.94f,0},{0.17f,0.48f,0.19f},2); // right arm
-    appendBox({-0.115f,0.31f,0},{0.15f,0.58f,0.20f},4); // left leg
-    appendBox({ 0.115f,0.31f,0},{0.15f,0.58f,0.20f},4); // right leg
+    appendBox({0,0.91f,0},{0.38f,0.54f,0.24f},0);
+    appendBox({0,1.49f,0},{0.32f,0.34f,0.32f},3);
+    appendBox({-0.29f,0.94f,0},{0.17f,0.48f,0.19f},1);
+    appendBox({ 0.29f,0.94f,0},{0.17f,0.48f,0.19f},2);
+    appendBox({-0.115f,0.31f,0},{0.15f,0.58f,0.20f},4);
+    appendBox({ 0.115f,0.31f,0},{0.15f,0.58f,0.20f},4);
     crowdIndexCount_=static_cast<gl::Size>(indices.size());
 
     gl::GenVertexArrays(1,&crowdVao_);
@@ -102,7 +100,6 @@ Renderer::Renderer(const std::filesystem::path& path)
     gl::VertexAttribDivisor(styleLocation,1);
     gl::BindVertexArray(0);
 
-    // A single unit paper rectangle is repeated through the instance buffer.
     const float quadVertices[]={-0.5f,-0.5f, 0.5f,-0.5f, 0.5f,0.5f, -0.5f,0.5f};
     const unsigned int quadIndices[]={0,1,2,0,2,3};
     gl::GenVertexArrays(1,&confettiVao_);
@@ -227,7 +224,7 @@ void Renderer::drawConfetti(const std::vector<ConfettiInstance>& instances) {
     confettiShader_.use();
     confettiShader_.set("uView",view_);
     confettiShader_.set("uProjection",projection_);
-    gl::Disable(gl::CULL_FACE); // Keep paper visible if viewed from either side.
+    gl::Disable(gl::CULL_FACE);
     gl::BindVertexArray(confettiVao_);
     gl::DrawElementsInstanced(gl::TRIANGLES,6,gl::UNSIGNED_INT,nullptr,
                               static_cast<gl::Size>(instances.size()));

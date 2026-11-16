@@ -6,8 +6,8 @@ out vec4 fragColor;
 
 void main() {
     vec3 color = vClothingColor;
-    if (vPart == 3) color = vec3(0.78, 0.57, 0.42); // simple skin tone
-    else if (vPart == 4) color *= 0.62;              // darker trousers
+    if (vPart == 3) color = vec3(0.78, 0.57, 0.42);
+    else if (vPart == 4) color *= 0.62;
     vec3 normal = normalize(vNormal);
     float wash = max(dot(normal, normalize(vec3(0.3, 0.7, -1.0))), 0.0);
     float overhead = max(normal.y, 0.0);

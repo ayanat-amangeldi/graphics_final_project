@@ -1,43 +1,23 @@
-# Проверка общего каркаса
+# Runtime Verification
 
-Каждый участник проверяет свою локальную копию до начала отдельной работы.
+The build commands in the [README](../README.md) provide the starting point for a clean checkout. The math checks verify transforms, projection, and scene coordinates. The executable also accepts `--smoke-test` for a short OpenGL launch and render check.
 
-## Сборка
+## Interactive checks
 
-- Открыта папка graphics_final_project, а не её родитель и не src.
-- Команды из README для своей ОС завершаются без ошибок.
-- Math tests показывают PASS, либо CTest показывает 100% tests passed.
-- `--smoke-test` завершается сообщением SMOKE PASS и кодом 0.
+| Check | Expected result |
+| --- | --- |
+| Initial scene | The venue, band, walking singer, six light rigs, LED screen, and audience are visible. The FPS counter updates in the HUD and window title |
+| Camera | Mouse and WASD change the view, Q/E change height, Shift accelerates movement, and R restores the starting view |
+| Cursor and window | Tab toggles capture. Window resizing preserves the scene proportions |
+| Light presets | Keys 1–3 change beam color and movement pattern |
+| Singer tracking | All six beams follow the walking singer while Space is held. The preset resumes on release |
+| Confetti | C emits particles above the stage. They fall and disappear |
+| LED | L freezes and resumes the animated pattern |
+| Audio | The built-in loop plays on an available output device. Light brightness and audience bounce follow the beat. M mutes audio while the visual rhythm continues |
+| Pause and help | P pauses the scene and audio while keeping the camera available. H toggles on-screen help |
+| Rendering | A front and side view show stable geometry without visible seams, flickering pairs of surfaces, or black faces |
+| Exit | Esc closes the application |
 
-## Ручная проверка
+## Performance record
 
-- Обычный запуск показывает подиум, фермы, экран, жёлтый маркер певца и маркеры зрителей.
-- WASD и мышь работают; Q/E меняют высоту, Shift ускоряет движение.
-- Tab освобождает курсор; повторное нажатие возвращает обзор.
-- После переключения в другое приложение камера не продолжает движение сама. После возвращения Tab снова включает обзор.
-- R возвращает камеру к начальному виду.
-- Изменение размеров окна не растягивает пропорции объектов.
-- 1/2/3 меняют номер пресета и цвет маркеров светильников.
-- P останавливает вращение маркеров, камера остаётся доступной; повторное P продолжает движение.
-- При удержании Space в HUD появляется ON, после отпускания OFF. Настоящего наведения пока нет.
-- C выводит один запрос в терминал на нажатие, не создаёт частицы.
-- L меняет LED ANIMATION STATE, изображение экрана пока статично.
-- H скрывает подробную помощь; FPS остаётся в заголовке окна.
-- FPS обновляется после первых 0.5 секунды. Это значение каркаса, не результат финального проекта.
-- Esc закрывает окно.
-
-## Что отправить в группу
-
-```text
-Имя:
-ОС и версия:
-Процессор / GPU:
-Способ сборки: Make или CMake, компилятор
-Сборка: OK / текст ошибки
-Math tests: OK / текст ошибки
-Smoke test: OK / текст ошибки
-Ручная проверка: OK / что не работает
-FPS каркаса при 1280x720:
-```
-
-На Windows и других Mac реальные проверки выполняют владельцы этих компьютеров. Не отмечаем их как пройденные заранее. Этот чеклист также не заменяет последующие замеры на машине TA.
+We record the OS, CPU/GPU, memory, build configuration, actual framebuffer resolution, soundtrack, and sample duration. At 1280 × 720, one run covers the regular show and a second covers preset changes, singer tracking, and repeated confetti. For each run, the FPS table records the minimum, mean, and maximum of the sampled readings. A Mac measurement and a grading-machine measurement are reported separately.

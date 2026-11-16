@@ -39,8 +39,6 @@ const std::vector<CrowdInstance>& audienceInstances() {
                 const int index=row*config::crowdColumns+column;
                 Vec3 color=palette[(row*7+column*5)%6];
                 float phase=static_cast<float>((index*37)%120)*radians(3.0f);
-                // Slightly scale the model to leave visible gaps between neighbors.
-                // Its front is local +Z; rotate it toward the stage (-Z).
                 Mat4 model=translation({x,0,z})*rotationY(radians(180))*scaling({0.88f,0.88f,0.88f});
                 result.push_back({model,{color.x,color.y,color.z,phase}});
             }

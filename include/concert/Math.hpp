@@ -18,7 +18,6 @@ inline Vec3 cross(Vec3 a, Vec3 b) {
 inline float length(Vec3 a) { return std::sqrt(dot(a,a)); }
 inline Vec3 normalize(Vec3 a) { float n=length(a); return n>1e-7f ? a/n : Vec3{}; }
 
-// Column-major storage, column vectors: world = parent * local * position.
 struct Mat4 {
     float m[16]{};
     static Mat4 identity() { Mat4 r; r.m[0]=r.m[5]=r.m[10]=r.m[15]=1; return r; }

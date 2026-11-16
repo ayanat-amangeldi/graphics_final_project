@@ -13,7 +13,6 @@ struct SingerPose {
 };
 
 inline SingerPose singerPose(double time) {
-    // The singer travels two metres either side of centre with zero speed at each turn.
     const double travel = std::fmod(time, 8.0) * (2.0 * pi / 8.0);
     const float x = 2.0f * static_cast<float>(std::sin(travel));
     const float direction = static_cast<float>(std::cos(travel));

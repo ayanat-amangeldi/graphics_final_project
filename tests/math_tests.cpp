@@ -13,7 +13,6 @@ void near(float actual,float expected,const char* label) {
 void near(Vec3 a,Vec3 b,const char* label) {near(a.x,b.x,label);near(a.y,b.y,label);near(a.z,b.z,label);}
 }
 int main() {
-    // Parent translation and rotation must also rotate the child's local offset.
     Mat4 parent=translation({3,2,1})*rotationY(radians(90));
     Mat4 child=translation({2,0,0})*scaling({2,3,4});
     near(transformPoint(parent*child,{0,0,0}),{3,2,-1},"parent-child pivot");

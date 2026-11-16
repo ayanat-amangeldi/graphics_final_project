@@ -5,7 +5,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# Default: build the included GLFW source; no package manager or download at configure time.
 option(CONCERT_USE_SYSTEM_GLFW "Use a preinstalled GLFW instead of the included source" OFF)
 if(CONCERT_USE_SYSTEM_GLFW)
     find_package(glfw3 3.3 REQUIRED)
@@ -46,7 +45,6 @@ if(BUILD_TESTING)
     target_include_directories(math_tests PRIVATE include)
     add_test(NAME transforms_and_coordinates COMMAND math_tests)
 endif()
-# Shader files remain editable after the first build, including in multi-config builds.
 add_custom_target(sync_shaders ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     "${CMAKE_CURRENT_SOURCE_DIR}/shaders" "$<TARGET_FILE_DIR:concert_stage>/shaders")
