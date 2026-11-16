@@ -20,13 +20,16 @@ constexpr Enum DEPTH_TEST=0x0B71,CULL_FACE=0x0B44,BLEND=0x0BE2;
 constexpr Enum COLOR_BUFFER_BIT=0x4000,DEPTH_BUFFER_BIT=0x0100;
 constexpr Enum VERSION=0x1F02,RENDERER=0x1F01,RGB=0x1907,PACK_ALIGNMENT=0x0D05;
 constexpr Enum NO_ERROR=0,BACK=0x0405;
-constexpr Bool FALSE_VALUE=0;
+constexpr Bool FALSE_VALUE=0,TRUE_VALUE=1;
+constexpr Enum ONE=1,SRC_ALPHA=0x0302;
 
 #define CONCERT_GL_FUNCTIONS(X) \
  X(void,Viewport,(Int,Int,Size,Size)) \
  X(void,ClearColor,(Float,Float,Float,Float)) \
  X(void,Clear,(Bits)) \
  X(void,Enable,(Enum)) \
+ X(void,DepthMask,(Bool)) \
+ X(void,BlendFunc,(Enum,Enum)) \
  X(void,Disable,(Enum)) \
  X(Enum,GetError,()) \
  X(const unsigned char*,GetString,(Enum)) \

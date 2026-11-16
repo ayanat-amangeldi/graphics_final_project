@@ -13,6 +13,12 @@ public:
     void update(const SceneState& state,float dt);
     void configure(Renderer& renderer,const SceneState& state) const;
     void draw(Renderer& renderer,const SceneState& state) const;
+    void drawBeams(Renderer& renderer) const;
+private:
+    struct RigPose { Mat4 mount, yoke, head; };
+    std::array<RigPose, config::rigAnchors.size()> poses_;
+    Spotlights lights_;
+    float phase_ = 0;
 };
 class Crowd {
 public:
@@ -52,6 +58,7 @@ public:
         lights_.configure(renderer,state);
         stage_.draw(renderer,state);lights_.draw(renderer,state);
         crowd_.draw(renderer,state);led_.draw(renderer,state);
+        lights_.drawBeams(renderer);
     }
 private: Stage stage_;LightShow lights_;Crowd crowd_;LedScreen led_;
 };
